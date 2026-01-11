@@ -1,62 +1,63 @@
-import appointment from "../models/Appointment.js";
+// Convention: Use Uppercase 'Appointment' for Models
+import Appointment from "../models/Appointment.js"; 
+import Patient from "../models/Patient.js";
 
 // ================= ADD NEW APPOINTMENT =================
 export const addAppointment = async (req, res) => {
-    try{
-        const {patient, doctor, date, time, reason} = req.body;
+    try {
+        const { patient, doctor, date, time, reason } = req.body;
 
-        const newAppointment = await appointment.create({
+        const newAppointment = await Appointment.create({
             patient,
             doctor,
             date,
             time,
             reason
-        })
+        });
 
         res.status(201).json({
-            message: "Appointment is succesfully created",
+            message: "Appointment successfully created",
             appointment: newAppointment
-        })
-    }catch(error){
+        });
+    } catch (error) {
         res.status(500).json({
-            message: "Failed to add patient",
+            // FIXED: Was previously saying "Failed to add patient"
+            message: "Failed to add appointment", 
             error: error.message
-        })
+        });
     }
 }
 
 // ================= GET ALL APPOINTMENTS =================
-export const getAppointments = async (req,res) => {
-    try{
-        // Fetch all appointments from MongoDB
-        const appointments = await appointment.find();
+export const getAppointments = async (req, res) => {
+    try {
+        // Fetch all appointments and use .populate() to get patient details
+        const appointments = await Appointment.find().populate("patient");
 
-        res.status(201).json(appointments)
+        // Use 200 for successful GET requests (201 is for 'Created')
+        res.status(200).json(appointments); 
 
-    }catch(error){
+    } catch (error) {
         res.status(500).json({
-            message: "failed to fetch appointments",
+            message: "Failed to fetch appointments",
             error: error.message
-        })
+        });
     }
 }
 
-
 // ================= DELETE APPOINTMENT =================
-export const deleteAppointment = async (req,res) =>{
-    try{
-    // Get appointment ID from URL
-    const { id } = req.params;
+export const deleteAppointment = async (req, res) => {
+    try {
+        const { id } = req.params;
+        await Appointment.findByIdAndDelete(id);
 
-    await appointment.findByIdAndDelete(id);
-
-    res.status(200).json({
-        message: "Appointment is succesfully deleted"
-    })
-}catch(error){
-    res.status(500).json({
-        message: "Appoinetment is not deleted",
-        error: error.message
-    })
-}
+        res.status(200).json({
+            message: "Appointment successfully deleted"
+        });
+    } catch (error) {
+        res.status(500).json({
+            message: "Appointment was not deleted",
+            error: error.message
+        });
+    }
 }

@@ -24,6 +24,6 @@ const patientSchema = new mongoose.Schema({
 }, 
 {timestamps: true})
 
-const patient = mongoose.model("patient", patientSchema)
+const patient = mongoose.model("Patient", patientSchema)
 
 export default patient;
